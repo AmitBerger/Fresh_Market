@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import * as bcrypt from 'bcrypt'; // <--- וודא שיש לך את הייבוא הזה
 
 @Injectable()
 export class UsersService {
@@ -10,8 +11,6 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  // שינינו חזרה את השם ל-findOneByEmail כדי שיתאים ל-AuthService
-  // ושינינו את הטיפוס המוחזר ל-User | null כדי שיתאים ל-TypeORM
   async findOneByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOneBy({ email });
   }
@@ -32,5 +31,20 @@ export class UsersService {
     }
     Object.assign(user, attrs);
     return this.usersRepository.save(user);
+  }
+
+  // --- פונקציה חדשה לשינוי סיסמה ---
+  async updatePassword(id: number, plainPassword: string): Promise<void> {
+    const user = await this.findById(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    
+    // הצפנת הסיסמה החדשה
+    const salt = await bcrypt.genSalt();
+    const hash = await bcrypt.hash(plainPassword, salt);
+    
+    user.passwordHash = hash;
+    await this.usersRepository.save(user);
   }
 }

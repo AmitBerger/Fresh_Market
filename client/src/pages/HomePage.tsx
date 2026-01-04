@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Button, Box, AppBar, Toolbar, Grid, CircularProgress, IconButton, TextField, MenuItem, Select, FormControl, InputLabel, Badge } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import HistoryIcon from '@mui/icons-material/History';
-import PersonIcon from '@mui/icons-material/Person'; // אייקון פרופיל
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate } from 'react-router-dom';
 import { getProducts, type Product } from '../services/api';
 import ProductCard from '../components/ProductCard';
@@ -60,11 +60,14 @@ const HomePage: React.FC = () => {
             Fresh Market 🍎
           </Typography>
 
-          <Button color="inherit" startIcon={<HistoryIcon />} onClick={() => navigate('/orders')}>
+          <Button
+            color="inherit"
+            startIcon={<ReceiptLongIcon />}
+            onClick={() => navigate('/profile', { state: { tab: 2 } })}
+          >
             My Orders
           </Button>
 
-          {/* כפתור פרופיל החדש */}
           <IconButton color="inherit" onClick={() => navigate('/profile')} sx={{ ml: 1 }}>
             <PersonIcon />
           </IconButton>
@@ -131,6 +134,7 @@ const HomePage: React.FC = () => {
             justifyContent="center"
             sx={{ width: '100%' }}
           >
+            
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
                 <Grid key={product.id} size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2.4 }}>

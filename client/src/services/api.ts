@@ -126,4 +126,9 @@ export const updateUserProfile = async (data: { firstName: string; lastName: str
   return response.data;
 };
 
+export const changeUserPassword = async (password: string) => {
+  const response = await api.patch('/users/profile/password', { password });
+  return response.data;
+};
+
 export default api;
