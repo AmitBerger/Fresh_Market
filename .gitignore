@@ -1,18 +1,23 @@
 # -----------------------
-# Node dependencies
+# Node / JavaScript (Global)
 # -----------------------
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
 # -----------------------
-# Build / Output
+# Build / Output (Global)
 # -----------------------
 dist/
 build/
+out/
 .tmp/
 *.tsbuildinfo
+.vite/
 
 # -----------------------
 # Environment / Secrets
@@ -26,9 +31,6 @@ build/
 # Logs
 # -----------------------
 *.log
-npm-debug.log*
-yarn-debug.log*
-pnpm-debug.log*
 
 # -----------------------
 # OS Files
@@ -48,6 +50,20 @@ Thumbs.db
 *.sw?
 
 # -----------------------
-# Coverage
+# Client-specific (React / Vite)
 # -----------------------
-coverage/
+client/node_modules/
+client/dist/
+client/.vite/
+client/.env
+client/.env.*.local
+
+# -----------------------
+# Server-specific (NestJS / Node)
+# -----------------------
+server/node_modules/
+server/dist/
+server/build/
+server/.env
+server/.env.*.local
+server/coverage/
