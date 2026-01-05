@@ -3,15 +3,15 @@ import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Post('signup')
   signUp(@Body() signUpDto: Record<string, any>) {
     // התיקון: מעבירים את כל 4 הפרמטרים בסדר הנכון
     return this.authService.signUp(
-      signUpDto.firstName, 
-      signUpDto.lastName, 
-      signUpDto.email, 
+      signUpDto.firstName,
+      signUpDto.lastName,
+      signUpDto.email,
       signUpDto.password
     );
   }

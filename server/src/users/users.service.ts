@@ -1,11 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
-import * as bcrypt from 'bcrypt'; // <--- וודא שיש לך את הייבוא הזה
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
+  // התיקון: הביטוי הזה מאפשר כל תו מיוחד (כולל נקודה, מקף, רווח וכו')
+  private readonly PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
@@ -29,22 +32,31 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    Object.assign(user, attrs);
+    
+    if (attrs.firstName) user.firstName = attrs.firstName;
+    if (attrs.lastName) user.lastName = attrs.lastName;
+
     return this.usersRepository.save(user);
   }
 
-  // --- פונקציה חדשה לשינוי סיסמה ---
   async updatePassword(id: number, plainPassword: string): Promise<void> {
+    if (!plainPassword || !this.PASSWORD_REGEX.test(plainPassword)) {
+        throw new BadRequestException(
+          'Password must be at least 8 characters long, contain 1 uppercase, 1 lowercase, 1 number and 1 special character',
+        );
+    }
+
     const user = await this.findById(id);
     if (!user) {
       throw new NotFoundException('User not found');
     }
     
-    // הצפנת הסיסמה החדשה
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(plainPassword, salt);
     
-    user.passwordHash = hash;
+    // שים לב: אנחנו משתמשים ב-'password' כדי להתאים לתיקון הקודם
+    user.password = hash; 
+    
     await this.usersRepository.save(user);
   }
 }

@@ -10,8 +10,13 @@ export class UsersController {
   @Get('profile')
   async getProfile(@Request() req) {
     const user = await this.usersService.findById(req.user.userId);
-    if (!user) throw new NotFoundException('User not found');
-    const { passwordHash, ...result } = user;
+    
+    if (!user) {
+        throw new NotFoundException('User not found');
+    }
+
+    // הסרת השדה password מהתשובה
+    const { password, ...result } = user;
     return result;
   }
 
@@ -19,11 +24,10 @@ export class UsersController {
   @Patch('profile')
   async updateProfile(@Request() req, @Body() body: { firstName: string; lastName: string }) {
     const updatedUser = await this.usersService.updateProfile(req.user.userId, body);
-    const { passwordHash, ...result } = updatedUser;
+    const { password, ...result } = updatedUser;
     return result;
   }
 
-  // --- נתיב חדש לשינוי סיסמה ---
   @UseGuards(AuthGuard('jwt'))
   @Patch('profile/password')
   async changePassword(@Request() req, @Body() body: { password: string }) {

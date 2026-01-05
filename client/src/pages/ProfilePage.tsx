@@ -12,7 +12,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -163,7 +163,7 @@ const ProfilePage: React.FC = () => {
             <Box>
               {ordersLoading ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                    <CircularProgress />
+                  <CircularProgress />
                 </Box>
               ) : orders.length === 0 ? (
                 <Typography align="center" color="text.secondary">No orders found.</Typography>
@@ -172,10 +172,10 @@ const ProfilePage: React.FC = () => {
                   <Accordion key={order.id} sx={{ mb: 2, border: '1px solid #eee' }} elevation={0}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ bgcolor: '#f9f9f9' }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mr: 2, alignItems: 'center' }}>
-                          <Typography fontWeight="bold">Order #{orders.length - index}</Typography>
-                          <Typography variant="body2">{new Date(order.createdAt).toLocaleDateString()}</Typography>
-                          <Chip label={order.status} color="primary" size="small" />
-                          <Typography fontWeight="bold">₪{Number(order.totalAmount).toFixed(2)}</Typography>
+                        <Typography fontWeight="bold">Order #{orders.length - index}</Typography>
+                        <Typography variant="body2">{new Date(order.createdAt).toLocaleDateString()}</Typography>
+                        <Chip label={order.status} color="primary" size="small" />
+                        <Typography fontWeight="bold">₪{Number(order.totalAmount).toFixed(2)}</Typography>
                       </Box>
                     </AccordionSummary>
                     <AccordionDetails>

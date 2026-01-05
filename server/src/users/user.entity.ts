@@ -1,5 +1,6 @@
-// src/users/user.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, OneToOne } from 'typeorm';
+import { Order } from '../orders/order.entity';
+import { Cart } from '../carts/cart.entity';
 
 export enum UserRole {
   CUSTOMER = 'CUSTOMER',
@@ -14,16 +15,18 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column({ name: 'password_hash', nullable: true }) // nullable עבור משתמשי גוגל
-  passwordHash: string;
+  @Column({ nullable: true }) 
+  password: string;
 
-  @Column({ name: 'google_id', unique: true, nullable: true })
+  @Column({ nullable: true })
   googleId: string;
 
-  @Column({ name: 'first_name' })
+  // הוספנו nullable: true כדי למנוע את הקריסה בגלל נתונים ישנים
+  @Column({ nullable: true })
   firstName: string;
 
-  @Column({ name: 'last_name', nullable: true }) // הנחתי ששם משפחה יכול להיות ריק בהתחלה, אפשר לשנות
+  // הוספנו nullable: true כדי למנוע את הקריסה בגלל נתונים ישנים
+  @Column({ nullable: true })
   lastName: string;
 
   @Column({
@@ -33,6 +36,12 @@ export class User {
   })
   role: UserRole;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt: Date;
+
+  @OneToOne(() => Cart, (cart) => cart.user)
+  cart: Cart;
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
 }

@@ -4,32 +4,68 @@ import { registerUser } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const RegisterPage: React.FC = () => {
-  const navigate = useNavigate(); // הוק למעבר בין דפים
-  
-  // ניהול ה-State של הטופס
+  const navigate = useNavigate();
+
+  // הגדרת אותם החוקים כמו בשרת
+  const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  // מתיר כל תו מיוחד (כולל #, -, ., _, וכו')
+  const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     password: '',
   });
-  const [error, setError] = useState('');
 
-  // עדכון ה-State בכל פעם שהמשתמש מקליד
+  const [errors, setErrors] = useState({
+    email: '',
+    password: '',
+    general: ''
+  });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    // ניקוי שגיאות בהקלדה
+    setErrors({ ...errors, [name]: '', general: '' });
   };
 
-  // שליחת הטופס
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // מניעת ריענון הדף
+    e.preventDefault();
+
+    let valid = true;
+    const newErrors = { email: '', password: '', general: '' };
+
+    // בדיקת שדות מלאים
+    if (!formData.firstName || !formData.lastName) {
+      newErrors.general = 'All fields are required';
+      valid = false;
+    }
+
+    // בדיקת אימייל
+    if (!EMAIL_REGEX.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+      valid = false;
+    }
+
+    // בדיקת סיסמה קשוחה
+    if (!PASSWORD_REGEX.test(formData.password)) {
+      newErrors.password = 'Min 8 chars, 1 Uppercase, 1 Lowercase, 1 Number, 1 Symbol (!@#$%)';
+      valid = false;
+    }
+
+    setErrors(newErrors);
+
+    if (!valid) return;
+
     try {
       await registerUser(formData);
-      // אם הצליח -> עוברים לדף התחברות
+      alert('Registration successful! Please login.');
       navigate('/login');
     } catch (err: any) {
       console.error(err);
-      setError('Registration failed. Try again.');
+      setErrors({ ...newErrors, general: err.response?.data?.message || 'Registration failed' });
     }
   };
 
@@ -41,36 +77,42 @@ const RegisterPage: React.FC = () => {
             Create Account
           </Typography>
 
-          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          {errors.general && <Alert severity="error" sx={{ mb: 2 }}>{errors.general}</Alert>}
 
           <form onSubmit={handleSubmit}>
             <Box sx={{ display: 'flex', gap: 2 }}>
-                <TextField
+              <TextField
                 margin="normal" required fullWidth
                 label="First Name" name="firstName"
                 value={formData.firstName} onChange={handleChange}
-                />
-                <TextField
+              />
+              <TextField
                 margin="normal" required fullWidth
                 label="Last Name" name="lastName"
                 value={formData.lastName} onChange={handleChange}
-                />
+              />
             </Box>
+
             <TextField
               margin="normal" required fullWidth
               label="Email Address" name="email" type="email"
               value={formData.email} onChange={handleChange}
+              error={!!errors.email}
+              helperText={errors.email}
             />
+
             <TextField
               margin="normal" required fullWidth
               label="Password" name="password" type="password"
               value={formData.password} onChange={handleChange}
+              error={!!errors.password}
+              helperText={errors.password} // כאן המשתמש יראה את דרישות הסיסמה אם הוא טועה
             />
-            
+
             <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
               Sign Up
             </Button>
-            
+
             <Button fullWidth color="secondary" onClick={() => navigate('/login')}>
               Already have an account? Login
             </Button>

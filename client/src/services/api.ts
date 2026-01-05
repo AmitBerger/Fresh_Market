@@ -53,10 +53,10 @@ export interface Order {
   status: string;
   createdAt: string;
   items: {
-      id: number;
-      quantity: number;
-      priceAtPurchase: number;
-      product: Product;
+    id: number;
+    quantity: number;
+    priceAtPurchase: number;
+    product: Product;
   }[];
 }
 

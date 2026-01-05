@@ -8,26 +8,37 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState('');
+  
+  const [emailError, setEmailError] = useState('');
+  const [serverError, setServerError] = useState('');
+
+  // אותו Regex כמו בהרשמה ובשרת
+  const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setServerError('');
+    setEmailError('');
+
+    if (!EMAIL_REGEX.test(email)) {
+        setEmailError('Invalid email format');
+        return;
+    }
+
     try {
       const data = await loginUser({ email, password });
       const token = data.access_token;
       
-      // לוגיקה של "זכור אותי"
       if (rememberMe) {
         localStorage.setItem('token', token);
       } else {
         sessionStorage.setItem('token', token);
       }
       
-      // שינוי: במקום אלרט, מעבר לעמוד הבית
       navigate('/home');
       
     } catch (err) {
-      setError('Invalid email or password');
+      setServerError('Invalid email or password');
     }
   };
 
@@ -39,13 +50,19 @@ const LoginPage: React.FC = () => {
             Sign In
           </Typography>
 
-          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          {serverError && <Alert severity="error" sx={{ mb: 2 }}>{serverError}</Alert>}
 
           <form onSubmit={handleLogin}>
             <TextField
               margin="normal" required fullWidth
               label="Email Address" type="email"
-              value={email} onChange={(e) => setEmail(e.target.value)}
+              value={email} 
+              onChange={(e) => {
+                  setEmail(e.target.value);
+                  setEmailError('');
+              }}
+              error={!!emailError}
+              helperText={emailError}
             />
             <TextField
               margin="normal" required fullWidth
